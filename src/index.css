@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+@theme {
+  --color-blue-50: #f0f9ff;
+  --color-blue-100: #e0f2fe;
+  --color-blue-200: #bae6fd;
+  --color-blue-300: #7dd3fc;
+  --color-blue-400: #38bdf8;
+  --color-blue-500: #118eea;
+  --color-blue-600: #0a73c2;
+  --color-blue-700: #085a9c;
+  --color-blue-800: #074d85;
+  --color-blue-900: #0c416e;
+}
+
+@layer base {
+  body {
+    @apply bg-slate-50 text-slate-800;
+  }
+}
