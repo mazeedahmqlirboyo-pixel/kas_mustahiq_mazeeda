@@ -1,7 +1,7 @@
 export const MUSTAHIQ_LIST = [
   "Bpk. Ahmad Syarief Qornel",
   "Bpk. Abdillah Khoironi",
-  "Bpk. Aunurrofiq",
+  "Bpk. M Khoirul Anwar",
   "Bpk. Abdul Wakhid",
   "Bpk. Adin Muhamad Mufid",
   "Bpk. Mohamad Khasan Bisri",
