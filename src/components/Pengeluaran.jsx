@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { MinusCircle, Calendar, FileText } from 'lucide-react';
-import { formatRupiah, parseRupiah } from '../utils/constants';
+import { MinusCircle, Calendar, FileText, Clock } from 'lucide-react';
+import { JAUSYAN_PERIODS, formatRupiah, parseRupiah } from '../utils/constants';
 
 const Pengeluaran = ({ onAddTransaction }) => {
   const getLocalDate = () => {
@@ -11,6 +11,7 @@ const Pengeluaran = ({ onAddTransaction }) => {
 
   const [amountStr, setAmountStr] = useState('');
   const [date, setDate] = useState(getLocalDate());
+  const [period, setPeriod] = useState(JAUSYAN_PERIODS[0]);
   const [description, setDescription] = useState('');
   const [success, setSuccess] = useState(false);
 
@@ -36,6 +37,7 @@ const Pengeluaran = ({ onAddTransaction }) => {
       type: 'out',
       amount,
       date,
+      period,
       description
     });
 
@@ -86,6 +88,25 @@ const Pengeluaran = ({ onAddTransaction }) => {
               value={date}
               className="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-3 text-slate-500 font-medium cursor-not-allowed"
             />
+          </div>
+
+          {/* Bulan Pengeluaran */}
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-2 flex items-center">
+              <Clock size={16} className="mr-2 text-slate-400" /> Bulan Pengeluaran
+            </label>
+            <div className="relative">
+              <select
+                required
+                value={period}
+                onChange={(e) => setPeriod(e.target.value)}
+                className="w-full appearance-none bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 focus:outline-none focus:ring-2 focus:ring-rose-500 transition-all font-medium"
+              >
+                {JAUSYAN_PERIODS.map(p => (
+                  <option key={p} value={p}>{p}</option>
+                ))}
+              </select>
+            </div>
           </div>
 
 
