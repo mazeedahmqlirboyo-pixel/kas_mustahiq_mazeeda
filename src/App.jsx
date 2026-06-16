@@ -4,16 +4,32 @@ import Beranda from './components/Beranda';
 import Pemasukan from './components/Pemasukan';
 import Pengeluaran from './components/Pengeluaran';
 import Rekapan from './components/Rekapan';
+import AdminPanel from './components/AdminPanel';
 import { supabase } from './utils/supabase';
 
 function App() {
   const [activeTab, setActiveTab] = useState('beranda');
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
-  // Load data dari Supabase saat aplikasi dimulai
+  // Load data dari Supabase saat aplikasi dimulai dan check auth session
   useEffect(() => {
     fetchTransactions();
+
+    // Check current auth session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsAdmin(session?.user?.email === 'admin@mazeeda.com');
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAdmin(session?.user?.email === 'admin@mazeeda.com');
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const fetchTransactions = async () => {
@@ -59,16 +75,81 @@ function App() {
     }
   };
 
+  // Mengedit transaksi
+  const handleUpdateTransaction = async (id, updatedTrx) => {
+    try {
+      const { data, error } = await supabase
+        .from('kas_transactions')
+        .update({
+          type: updatedTrx.type,
+          amount: updatedTrx.amount,
+          date: updatedTrx.date,
+          period: updatedTrx.period,
+          description: updatedTrx.description
+        })
+        .eq('id', id)
+        .select();
+
+      if (error) throw error;
+      if (data && data.length > 0) {
+        setTransactions(prev => prev.map(t => t.id === id ? data[0] : t));
+        return { success: true };
+      }
+    } catch (error) {
+      console.error('Error during update:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  // Menghapus transaksi
+  const handleDeleteTransaction = async (id) => {
+    try {
+      const { error } = await supabase
+        .from('kas_transactions')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      setTransactions(prev => prev.filter(t => t.id !== id));
+      return { success: true };
+    } catch (error) {
+      console.error('Error during delete:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
   const renderContent = () => {
     switch (activeTab) {
       case 'beranda':
-        return <Beranda transactions={transactions} />;
+        return (
+          <Beranda 
+            transactions={transactions} 
+            isAdmin={isAdmin} 
+            setIsAdmin={setIsAdmin} 
+            setActiveTab={setActiveTab} 
+          />
+        );
       case 'pemasukan':
         return <Pemasukan onAddTransaction={handleAddTransaction} />;
       case 'pengeluaran':
         return <Pengeluaran onAddTransaction={handleAddTransaction} />;
       case 'rekapan':
         return <Rekapan transactions={transactions} />;
+      case 'admin':
+        return isAdmin ? (
+          <AdminPanel 
+            transactions={transactions} 
+            onUpdateTransaction={handleUpdateTransaction}
+            onDeleteTransaction={handleDeleteTransaction}
+          />
+        ) : (
+          <Beranda 
+            transactions={transactions} 
+            isAdmin={isAdmin} 
+            setIsAdmin={setIsAdmin} 
+            setActiveTab={setActiveTab} 
+          />
+        );
       default:
         return <Beranda transactions={transactions} />;
     }
@@ -93,7 +174,7 @@ function App() {
       </div>
 
       {/* Bottom Navigation */}
-      <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
+      <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} isAdmin={isAdmin} />
     </div>
   );
 }

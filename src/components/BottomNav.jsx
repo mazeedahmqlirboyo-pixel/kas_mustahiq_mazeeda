@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, PlusCircle, MinusCircle, FileText } from 'lucide-react';
+import { Home, PlusCircle, MinusCircle, FileText, ShieldCheck } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -7,13 +7,17 @@ function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
 
-const BottomNav = ({ activeTab, setActiveTab }) => {
+const BottomNav = ({ activeTab, setActiveTab, isAdmin }) => {
   const tabs = [
     { id: 'beranda', label: 'Beranda', icon: Home },
     { id: 'pemasukan', label: 'Masuk', icon: PlusCircle },
     { id: 'pengeluaran', label: 'Keluar', icon: MinusCircle },
     { id: 'rekapan', label: 'Rekapan', icon: FileText },
   ];
+
+  if (isAdmin) {
+    tabs.push({ id: 'admin', label: 'Kelola', icon: ShieldCheck });
+  }
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-6 py-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-50">
