@@ -116,31 +116,42 @@ const Beranda = ({ transactions, isAdmin, setIsAdmin, setActiveTab }) => {
       <div className="px-5 mt-8">
         <h3 className="text-slate-800 font-bold text-lg mb-4">Aktivitas Terbaru</h3>
         
-        <div className="space-y-3">
-          {recentActivity.length === 0 ? (
-            <div className="text-center py-8 bg-white rounded-2xl border border-slate-100 shadow-sm">
-              <p className="text-slate-500 text-sm">Belum ada transaksi</p>
-            </div>
-          ) : (
-            recentActivity.map(trx => (
-              <div key={trx.id} className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <div className={`p-2.5 rounded-xl ${trx.type === 'in' ? 'bg-blue-50 text-blue-600' : 'bg-rose-50 text-rose-600'}`}>
-                    {trx.type === 'in' ? <ArrowUpCircle size={20} /> : <ArrowDownCircle size={20} />}
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-slate-800 line-clamp-1">{trx.description}</h4>
-                    <p className="text-xs text-slate-500 mt-0.5">{trx.date} • {trx.period}</p>
-                  </div>
-                </div>
-                <div className="text-right ml-2 flex-shrink-0">
-                  <span className={`text-sm font-bold ${trx.type === 'in' ? 'text-blue-600' : 'text-rose-600'}`}>
-                    {trx.type === 'in' ? '+' : '-'}{formatRupiah(trx.amount)}
-                  </span>
-                </div>
-              </div>
-            ))
-          )}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm text-slate-600">
+              <thead className="bg-slate-50 border-b border-slate-100 text-xs uppercase text-slate-500 font-semibold">
+                <tr>
+                  <th className="px-4 py-3 whitespace-nowrap">Tanggal</th>
+                  <th className="px-4 py-3">Keterangan</th>
+                  <th className="px-4 py-3 text-right whitespace-nowrap">Masuk/Keluar</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {recentActivity.length === 0 ? (
+                  <tr>
+                    <td colSpan="3" className="text-center py-8 text-slate-500">Belum ada transaksi</td>
+                  </tr>
+                ) : (
+                  recentActivity.map(trx => (
+                    <tr key={trx.id} className="hover:bg-slate-50/50 transition-colors">
+                      <td className="px-4 py-3 whitespace-nowrap align-top">
+                        <div className="font-medium text-slate-800">{trx.date}</div>
+                        <div className="text-xs text-slate-500 mt-0.5">{trx.period}</div>
+                      </td>
+                      <td className="px-4 py-3 align-top min-w-[140px]">
+                        <span className="font-medium text-slate-800">{trx.description}</span>
+                      </td>
+                      <td className="px-4 py-3 text-right whitespace-nowrap align-top font-bold">
+                        <span className={trx.type === 'in' ? 'text-blue-600' : 'text-rose-600'}>
+                          {trx.type === 'in' ? '+' : '-'}{formatRupiah(trx.amount)}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 

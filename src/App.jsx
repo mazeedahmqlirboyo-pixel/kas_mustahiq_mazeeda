@@ -4,6 +4,7 @@ import Beranda from './components/Beranda';
 import Pemasukan from './components/Pemasukan';
 import Pengeluaran from './components/Pengeluaran';
 import Rekapan from './components/Rekapan';
+import TabelKas from './components/TabelKas';
 import AdminPanel from './components/AdminPanel';
 import { supabase } from './utils/supabase';
 
@@ -135,6 +136,8 @@ function App() {
         return <Pengeluaran onAddTransaction={handleAddTransaction} />;
       case 'rekapan':
         return <Rekapan transactions={transactions} />;
+      case 'tabel':
+        return <TabelKas transactions={transactions} />;
       case 'admin':
         return isAdmin ? (
           <AdminPanel 

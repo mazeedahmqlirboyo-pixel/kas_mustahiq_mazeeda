@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, PlusCircle, MinusCircle, FileText, ShieldCheck } from 'lucide-react';
+import { Home, PlusCircle, MinusCircle, FileText, LayoutList, ShieldCheck } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -13,6 +13,7 @@ const BottomNav = ({ activeTab, setActiveTab, isAdmin }) => {
     { id: 'pemasukan', label: 'Masuk', icon: PlusCircle },
     { id: 'pengeluaran', label: 'Keluar', icon: MinusCircle },
     { id: 'rekapan', label: 'Rekapan', icon: FileText },
+    { id: 'tabel', label: 'Tabel', icon: LayoutList },
   ];
 
   if (isAdmin) {

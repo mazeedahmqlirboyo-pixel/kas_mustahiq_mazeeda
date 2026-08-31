@@ -14,6 +14,9 @@ export const MUSTAHIQ_LIST = [
 ];
 
 export const JAUSYAN_PERIODS = [
+  "Syawal",
+  "Dzul Qo'dah",
+  "Dzul Hijjah",
   "Muharram",
   "Shofar",
   "Robi'ul Awal",
@@ -22,10 +25,7 @@ export const JAUSYAN_PERIODS = [
   "Jumadil Akhir",
   "Rojab",
   "Sya'ban",
-  "Romadhon",
-  "Syawal",
-  "Dzul Qo'dah",
-  "Dzul Hijjah"
+  "Romadhon"
 ];
 
 // Helper untuk format Rupiah
