@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import BottomNav from './components/BottomNav';
 import Beranda from './components/Beranda';
-import Pemasukan from './components/Pemasukan';
-import Pengeluaran from './components/Pengeluaran';
+import Transaksi from './components/Transaksi';
 import Rekapan from './components/Rekapan';
 import TabelKas from './components/TabelKas';
 import AdminPanel from './components/AdminPanel';
@@ -131,9 +130,9 @@ function App() {
           />
         );
       case 'pemasukan':
-        return <Pemasukan onAddTransaction={handleAddTransaction} />;
+        return <Transaksi key="in" initialType="in" onAddTransaction={handleAddTransaction} />;
       case 'pengeluaran':
-        return <Pengeluaran onAddTransaction={handleAddTransaction} />;
+        return <Transaksi key="out" initialType="out" onAddTransaction={handleAddTransaction} />;
       case 'rekapan':
         return <Rekapan transactions={transactions} />;
       case 'tabel':
