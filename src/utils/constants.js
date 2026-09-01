@@ -1,18 +1,3 @@
-export const MUSTAHIQ_LIST = [
-  "Bpk. Ahmad Syarief Qornel",
-  "Bpk. Abdillah Khoironi",
-  "Bpk. M Khoirul Anwar",
-  "Bpk. Abdul Wakhid",
-  "Bpk. Adin Muhamad Mufid",
-  "Bpk. Mohamad Khasan Bisri",
-  "Bpk. Choerul Anam",
-  "Bpk. Muhammad Ricky Gunawan Pratama",
-  "Bpk. Agus Wahyudin",
-  "Bpk. Muhammad Hadi Mafatih",
-  "Bpk. Muchammad Haqqinnazili",
-  "Bpk. Muhammad Burhanuddin Ramadhan"
-];
-
 export const JAUSYAN_PERIODS = [
   "Syawal",
   "Dzul Qo'dah",

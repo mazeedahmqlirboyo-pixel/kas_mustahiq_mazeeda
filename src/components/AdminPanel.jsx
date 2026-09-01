@@ -14,10 +14,15 @@ import {
   DollarSign,
   AlertTriangle
 } from 'lucide-react';
-import { JAUSYAN_PERIODS, MUSTAHIQ_LIST, formatRupiah, parseRupiah } from '../utils/constants';
+import { JAUSYAN_PERIODS, formatRupiah, parseRupiah } from '../utils/constants';
 import { supabase } from '../utils/supabase';
 
-const AdminPanel = ({ transactions, onUpdateTransaction, onDeleteTransaction }) => {
+import AdminMustahiq from './AdminMustahiq';
+
+const AdminPanel = ({ transactions, mustahiqs, setMustahiqs, onUpdateTransaction, onDeleteTransaction }) => {
+  // Tab state
+  const [activeAdminTab, setActiveAdminTab] = useState('transaksi'); // 'transaksi' or 'mustahiq'
+
   // Search & Filter state
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState('all'); // all, in, out
@@ -40,10 +45,14 @@ const AdminPanel = ({ transactions, onUpdateTransaction, onDeleteTransaction }) 
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState('');
 
-  const handleLogout = async () => {
-    if (window.confirm('Apakah Anda yakin ingin keluar dari panel admin?')) {
-      await supabase.auth.signOut();
-    }
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+
+  const handleLogoutClick = () => {
+    setIsLogoutModalOpen(true);
+  };
+
+  const confirmLogout = async () => {
+    await supabase.auth.signOut();
   };
 
   // Filtered transactions list
@@ -140,7 +149,7 @@ const AdminPanel = ({ transactions, onUpdateTransaction, onDeleteTransaction }) 
           </div>
         </div>
         <button 
-          onClick={handleLogout}
+          onClick={handleLogoutClick}
           className="flex items-center space-x-1.5 bg-slate-800 hover:bg-slate-700 active:bg-slate-900 px-3 py-1.5 rounded-xl text-xs font-semibold text-rose-400 transition-colors border border-slate-700 cursor-pointer"
         >
           <LogOut size={14} />
@@ -148,8 +157,28 @@ const AdminPanel = ({ transactions, onUpdateTransaction, onDeleteTransaction }) 
         </button>
       </div>
 
-      {/* Search & Filters */}
-      <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 mb-6 space-y-3">
+      {/* Admin Tabs */}
+      <div className="flex bg-slate-100 rounded-xl p-1 mb-6">
+        <button
+          onClick={() => setActiveAdminTab('transaksi')}
+          className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${activeAdminTab === 'transaksi' ? 'bg-white shadow-sm text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
+        >
+          Kelola Transaksi
+        </button>
+        <button
+          onClick={() => setActiveAdminTab('mustahiq')}
+          className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${activeAdminTab === 'mustahiq' ? 'bg-white shadow-sm text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
+        >
+          Kelola Mustahiq
+        </button>
+      </div>
+
+      {activeAdminTab === 'mustahiq' ? (
+        <AdminMustahiq mustahiqs={mustahiqs} setMustahiqs={setMustahiqs} />
+      ) : (
+        <>
+          {/* Search & Filters */}
+          <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 mb-6 space-y-3">
         {/* Search */}
         <div className="relative">
           <Search className="absolute left-3.5 top-3.5 text-slate-400" size={16} />
@@ -293,7 +322,7 @@ const AdminPanel = ({ transactions, onUpdateTransaction, onDeleteTransaction }) 
                     onClick={() => {
                       setEditType('in');
                       // Reset ke pilihan list mustahiq pertama jika tipe pindah ke pemasukan
-                      setEditDesc(MUSTAHIQ_LIST[0]);
+                      setEditDesc(mustahiqs[0]?.name || '');
                     }}
                     className={`flex-1 text-center py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${editType === 'in' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-500 hover:text-slate-800'}`}
                   >
@@ -377,8 +406,8 @@ const AdminPanel = ({ transactions, onUpdateTransaction, onDeleteTransaction }) 
                     className="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="" disabled>Pilih Mustahiq...</option>
-                    {MUSTAHIQ_LIST.map(m => (
-                      <option key={m} value={m}>{m}</option>
+                    {mustahiqs.map(m => (
+                      <option key={m.id} value={m.name}>{m.name}</option>
                     ))}
                   </select>
                 ) : (
@@ -479,6 +508,48 @@ const AdminPanel = ({ transactions, onUpdateTransaction, onDeleteTransaction }) 
                 ) : (
                   'Hapus Data'
                 )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+        </>
+      )}
+
+      {/* LOGOUT CONFIRMATION MODAL */}
+      {isLogoutModalOpen && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-200 relative">
+            <button 
+              onClick={() => setIsLogoutModalOpen(false)}
+              className="absolute top-4 right-4 p-1.5 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+            >
+              <X size={20} />
+            </button>
+
+            <div className="flex flex-col items-center text-center mt-2 mb-6">
+              <div className="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mb-4">
+                <LogOut size={24} />
+              </div>
+              <h3 className="text-lg font-bold text-slate-800">Keluar Panel Admin?</h3>
+              <p className="text-sm text-slate-500 mt-2 px-2 leading-relaxed">
+                Anda akan keluar dari sesi admin. Untuk masuk kembali, Anda harus memasukkan kata sandi lagi.
+              </p>
+            </div>
+
+            <div className="flex items-center space-x-3">
+              <button
+                type="button"
+                onClick={() => setIsLogoutModalOpen(false)}
+                className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl text-sm font-bold transition-all active:scale-[0.98] cursor-pointer"
+              >
+                Batal
+              </button>
+              <button
+                onClick={confirmLogout}
+                className="flex-1 bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white py-3 rounded-xl text-sm font-bold shadow-md shadow-rose-100 transition-all active:scale-[0.98] flex justify-center items-center cursor-pointer"
+              >
+                Ya, Keluar
               </button>
             </div>
           </div>

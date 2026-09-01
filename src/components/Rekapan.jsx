@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { FileText, Filter, ArrowUpCircle, ArrowDownCircle, UserX, AlertCircle, CheckCircle } from 'lucide-react';
-import { JAUSYAN_PERIODS, MUSTAHIQ_LIST, formatRupiah } from '../utils/constants';
+import { JAUSYAN_PERIODS, formatRupiah } from '../utils/constants';
 
-const Rekapan = ({ transactions }) => {
+const Rekapan = ({ transactions, mustahiqs = [] }) => {
   const [filterPeriod, setFilterPeriod] = useState(JAUSYAN_PERIODS[0]);
 
   const filteredTransactions = transactions.filter(t => t.period === filterPeriod);
@@ -17,11 +17,11 @@ const Rekapan = ({ transactions }) => {
 
   const targetTagihan = 50000;
 
-  const mustahiqPayments = MUSTAHIQ_LIST.map(m => {
+  const mustahiqPayments = mustahiqs.map(m => {
     const totalPaid = filteredTransactions
-      .filter(t => t.type === 'in' && t.description === m)
+      .filter(t => t.type === 'in' && t.description === m.name)
       .reduce((acc, curr) => acc + curr.amount, 0);
-    return { name: m, totalPaid };
+    return { name: m.name, totalPaid };
   });
 
   const mBelumBayar = mustahiqPayments.filter(m => m.totalPaid === 0);

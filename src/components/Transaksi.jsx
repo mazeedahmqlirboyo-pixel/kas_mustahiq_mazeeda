@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { WalletCards, Calendar, User, Clock, CheckCircle2, ChevronDown } from 'lucide-react';
-import { MUSTAHIQ_LIST, JAUSYAN_PERIODS, formatRupiah, parseRupiah } from '../utils/constants';
+import { JAUSYAN_PERIODS, formatRupiah, parseRupiah } from '../utils/constants';
 
-const Transaksi = ({ onAddTransaction, initialType = 'in' }) => {
+const Transaksi = ({ onAddTransaction, initialType = 'in', mustahiqs = [] }) => {
   const getLocalDate = () => {
     const d = new Date();
     d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
@@ -175,14 +175,14 @@ const Transaksi = ({ onAddTransaction, initialType = 'in' }) => {
                   <>
                     <div className="fixed inset-0 z-10" onClick={() => setIsMustahiqOpen(false)}></div>
                     <div className="absolute z-20 w-full mt-2 bg-white border border-slate-100 rounded-xl shadow-xl max-h-60 overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
-                      {MUSTAHIQ_LIST.map(m => (
+                      {mustahiqs.map(m => (
                         <button
-                          key={m}
+                          key={m.id}
                           type="button"
-                          onClick={() => { setDescription(m); setIsMustahiqOpen(false); }}
-                          className={`w-full text-left px-4 py-3 text-sm transition-colors border-b border-slate-50 last:border-0 ${description === m ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'}`}
+                          onClick={() => { setDescription(m.name); setIsMustahiqOpen(false); }}
+                          className={`w-full text-left px-4 py-3 text-sm transition-colors border-b border-slate-50 last:border-0 ${description === m.name ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'}`}
                         >
-                          {m}
+                          {m.name}
                         </button>
                       ))}
                     </div>

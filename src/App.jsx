@@ -10,12 +10,13 @@ import { supabase } from './utils/supabase';
 function App() {
   const [activeTab, setActiveTab] = useState('beranda');
   const [transactions, setTransactions] = useState([]);
+  const [mustahiqs, setMustahiqs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
 
   // Load data dari Supabase saat aplikasi dimulai dan check auth session
   useEffect(() => {
-    fetchTransactions();
+    fetchData();
 
     // Check current auth session
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -32,17 +33,24 @@ function App() {
     };
   }, []);
 
-  const fetchTransactions = async () => {
+  const fetchData = async () => {
     try {
-      const { data, error } = await supabase
-        .from('kas_transactions')
-        .select('*')
-        .order('created_at', { ascending: false });
+      setLoading(true);
+      const [trxResponse, mustahiqResponse] = await Promise.all([
+        supabase.from('kas_transactions').select('*').order('created_at', { ascending: false }),
+        supabase.from('kas_mustahiq').select('*').order('name', { ascending: true })
+      ]);
 
-      if (error) throw error;
-      if (data) setTransactions(data);
+      if (trxResponse.error) throw trxResponse.error;
+      if (mustahiqResponse.error && mustahiqResponse.error.code !== '42P01') { 
+        // Ignore 42P01 (relation does not exist) to avoid app crash before SQL is run
+        throw mustahiqResponse.error; 
+      }
+
+      if (trxResponse.data) setTransactions(trxResponse.data);
+      if (mustahiqResponse.data) setMustahiqs(mustahiqResponse.data);
     } catch (error) {
-      console.error('Error fetching transactions:', error);
+      console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
     }
@@ -130,17 +138,19 @@ function App() {
           />
         );
       case 'pemasukan':
-        return <Transaksi key="in" initialType="in" onAddTransaction={handleAddTransaction} />;
+        return <Transaksi key="in" initialType="in" onAddTransaction={handleAddTransaction} mustahiqs={mustahiqs} />;
       case 'pengeluaran':
-        return <Transaksi key="out" initialType="out" onAddTransaction={handleAddTransaction} />;
+        return <Transaksi key="out" initialType="out" onAddTransaction={handleAddTransaction} mustahiqs={mustahiqs} />;
       case 'rekapan':
-        return <Rekapan transactions={transactions} />;
+        return <Rekapan transactions={transactions} mustahiqs={mustahiqs} />;
       case 'tabel':
-        return <TabelKas transactions={transactions} />;
+        return <TabelKas transactions={transactions} mustahiqs={mustahiqs} />;
       case 'admin':
         return isAdmin ? (
           <AdminPanel 
             transactions={transactions} 
+            mustahiqs={mustahiqs}
+            setMustahiqs={setMustahiqs}
             onUpdateTransaction={handleUpdateTransaction}
             onDeleteTransaction={handleDeleteTransaction}
           />

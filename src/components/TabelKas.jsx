@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { formatRupiah, MUSTAHIQ_LIST } from '../utils/constants';
+import { formatRupiah } from '../utils/constants';
 import { ChevronDown, ChevronUp, MessageCircle, LayoutList } from 'lucide-react';
 
 // Urutan bulan custom sesuai permintaan (mulai dari Syawal)
@@ -18,7 +18,7 @@ const CUSTOM_MONTH_ORDER = {
   "Romadhon": 12,
 };
 
-const TabelKas = ({ transactions }) => {
+const TabelKas = ({ transactions, mustahiqs = [] }) => {
   const [expandedUnpaid, setExpandedUnpaid] = useState({});
 
   const toggleUnpaid = (period) => {
@@ -88,7 +88,7 @@ const TabelKas = ({ transactions }) => {
             const saldoBulanIni = group.totalMasuk - group.totalKeluar;
             
             // Hitung siapa saja yang belum bayar
-            const unpaidMustahiq = MUSTAHIQ_LIST.filter(m => !group.paidMustahiq.has(m));
+            const unpaidMustahiq = mustahiqs.filter(m => !group.paidMustahiq.has(m.name));
             const allPaid = unpaidMustahiq.length === 0;
             const isExpanded = expandedUnpaid[group.period];
             
@@ -134,12 +134,15 @@ const TabelKas = ({ transactions }) => {
                           <div className="p-2.5 pt-0 text-slate-500 bg-slate-50/50">
                             <ul className="mt-1 space-y-1">
                               {unpaidMustahiq.map(m => {
-                                const waMessage = `Assalamu'alaikum ${m},\n\nIzin mengingatkan untuk setoran Kas Mustahiq MAZEEDA periode bulan *${group.period}*. Mohon segera diselesaikan ya.\n\nTerima kasih! 🙏`;
-                                const waUrl = `https://wa.me/?text=${encodeURIComponent(waMessage)}`;
+                                const waMessage = `Assalamu'alaikum ${m.name},\n\nIzin mengingatkan untuk setoran Kas Mustahiq MAZEEDA periode bulan *${group.period}*. Mohon segera diselesaikan ya.\n\nTerima kasih! \uD83D\uDE4F`;
+                                const phone = m.phone;
+                                const waUrl = phone 
+                                  ? `https://wa.me/${phone}?text=${encodeURIComponent(waMessage)}` 
+                                  : `https://wa.me/?text=${encodeURIComponent(waMessage)}`;
 
                                 return (
-                                  <li key={m} className="flex items-center justify-between py-1.5 border-t border-slate-200">
-                                    <span className="italic">{m}</span>
+                                  <li key={m.id} className="flex items-center justify-between py-1.5 border-t border-slate-200">
+                                    <span className="italic">{m.name}</span>
                                     <a 
                                       href={waUrl}
                                       target="_blank"
